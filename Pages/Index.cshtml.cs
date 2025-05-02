@@ -1,31 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TodoApp.Models;
-using System.Collections.Generic;
+using TodoApp.Data;
+using System.Linq;
 
 namespace TodoApp.Pages
 {
     public class IndexModel : PageModel
     {
-        public static readonly List<TodoItem> TodoList = new List<TodoItem>(); //  ВНИМАНИЕ:  Используется статический список для хранения данных в памяти. Для постоянного хранения используйте базу данных.
+        private readonly TodoContext _context;
+
+        public IndexModel(TodoContext context)
+        {
+            _context = context;
+        }
+
+        public IList<TodoItem> TodoList { get; set; } = new List<TodoItem>();
 
         [BindProperty]
         public TodoItem NewTodo { get; set; } = new TodoItem();
 
-        public void OnGet()
-        {
-        }
-
         public IActionResult OnPostAddTodo()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+            // Устанавливаем DateTimeKind как UTC
+            NewTodo.StartTime = DateTime.SpecifyKind(NewTodo.StartTime, DateTimeKind.Utc);
+            NewTodo.EndTime = DateTime.SpecifyKind(NewTodo.EndTime, DateTimeKind.Utc);
 
-            NewTodo.Id = TodoList.Count > 0 ? TodoList.Max(t => t.Id) + 1 : 1;
-            TodoList.Add(NewTodo);
-            NewTodo = new TodoItem(); // Clear the NewTodo property
+            // Проверяем ModelState
+            if (!ModelState.IsValid)
+                return Page();
+
+            // Добавляем задачу в контекст
+            _context.Todos.Add(NewTodo);
+
+            // Сохраняем изменения в базе данных
+            _context.SaveChanges();
 
             return RedirectToPage();
         }
@@ -33,22 +42,34 @@ namespace TodoApp.Pages
 
         public IActionResult OnPostToggleDone(int id)
         {
-            var todo = TodoList.FirstOrDefault(t => t.Id == id);
+            var todo = _context.Todos.FirstOrDefault(t => t.Id == id);
             if (todo != null)
             {
                 todo.IsDone = !todo.IsDone;
+                _context.SaveChanges();
             }
             return RedirectToPage();
         }
 
         public IActionResult OnPostDeleteTodo(int id)
         {
-            var todo = TodoList.FirstOrDefault(t => t.Id == id);
+            var todo = _context.Todos.FirstOrDefault(t => t.Id == id);
             if (todo != null)
             {
-                TodoList.Remove(todo);
+                _context.Todos.Remove(todo);
+                _context.SaveChanges();
             }
             return RedirectToPage();
+        }
+
+        public IList<TodoItem> SortedTodoList { get; set; } = new List<TodoItem>();
+
+        public void OnGet()
+        {
+            SortedTodoList = _context.Todos
+                .OrderBy(t => t.Date)
+                .ThenBy(t => t.StartTime)
+                .ToList();
         }
     }
 }

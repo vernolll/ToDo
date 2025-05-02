@@ -7,38 +7,61 @@
 <h1>@ViewData["Title"]</h1>
 
 <form method="post" asp-page-handler="AddTodo">
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" asp-for="NewTodo.Description" placeholder="Описание задачи" aria-label="Описание задачи" aria-describedby="basic-addon2">
-        <div class="input-group-append">
-            <button class="btn btn-primary" type="submit">Добавить</button>
-        </div>
+    <div class="mb-3">
+        <input type="text" class="form-control" asp-for="NewTodo.Description" placeholder="Описание задачи" />
         <span asp-validation-for="NewTodo.Description" class="text-danger"></span>
     </div>
+
+    <div class="row">
+        <div class="col">
+            <label asp-for="NewTodo.StartTime"></label>
+            <input type="time" class="form-control" asp-for="NewTodo.StartTime" />
+        </div>
+        <div class="col">
+            <label asp-for="NewTodo.EndTime"></label>
+            <input type="time" class="form-control" asp-for="NewTodo.EndTime" />
+        </div>
+        <div class="col">
+            <label asp-for="NewTodo.Date"></label>
+            <input type="date" class="form-control" asp-for="NewTodo.Date" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary mt-3" type="submit">Добавить</button>
 </form>
 
-<ul class="list-group">
-    @foreach (var todo in IndexModel.TodoList)
+<ul class="list-group mt-4">
+    @foreach (var todo in Model.SortedTodoList)
     {
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            @if (todo.IsDone)
-            {
-                <del>@todo.Description</del>
-            }
-            else
-            {
-                @todo.Description
-            }
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                    @if (todo.IsDone)
+                    {
+                                <del>@todo.Description</del>
+                    }
+                    else
+                    {
+                        @todo.Description
+                    }
 
-            <div>
-                <form method="post" asp-page-handler="ToggleDone" asp-route-id="@todo.Id" class="d-inline">
-                    <button type="submit" class="btn btn-sm @(todo.IsDone ? "btn-success" : "btn-outline-success")">
-                        @(todo.IsDone ? "Снять с выполнения" : "Выполнить")
-                    </button>
-                </form>
-                <form method="post" asp-page-handler="DeleteTodo" asp-route-id="@todo.Id" class="d-inline">
-                    <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
-                </form>
-            </div>
-        </li>
+                       <div class="text-muted small">
+                        @todo.Date.ToString("dd.MM.yyyy") — @todo.DayOfWeek
+        <text>, @($"{todo.StartTime:hh\\:mm} - {todo.EndTime:hh\\:mm}")</text>
+    </div>
+
+                    </div>
+                    <div>
+                        <form method="post" asp-page-handler="ToggleDone" asp-route-id="@todo.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm @(todo.IsDone ? "btn-success" : "btn-outline-success")">
+                            @(todo.IsDone ? "Снять с выполнения" : "Выполнить")
+                            </button>
+                        </form>
+                        <form method="post" asp-page-handler="DeleteTodo" asp-route-id="@todo.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
     }
 </ul>
