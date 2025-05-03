@@ -16,3 +16,9 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.validation-summary-errors {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}

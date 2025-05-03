@@ -7,6 +7,7 @@
 <h1>@ViewData["Title"]</h1>
 
 <form method="post" asp-page-handler="AddTodo">
+    <div asp-validation-summary="All" class="validation-summary-errors"></div>
     <div class="mb-3">
         <input type="text" class="form-control" asp-for="NewTodo.Description" placeholder="Описание задачи" />
         <span asp-validation-for="NewTodo.Description" class="text-danger"></span>
@@ -23,7 +24,7 @@
         </div>
         <div class="col">
             <label asp-for="NewTodo.Date"></label>
-            <input type="date" class="form-control" asp-for="NewTodo.Date" />
+            <input type="date" class="form-control" asp-for="NewTodo.Date" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
         </div>
     </div>
 
@@ -31,37 +32,45 @@
 </form>
 
 <ul class="list-group mt-4">
-    @foreach (var todo in Model.SortedTodoList)
+    @foreach (var group in Model.SortedTodoList.GroupBy(t => t.Date.Date).OrderBy(g => g.Key))
     {
-            <li class="list-group-item">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                    @if (todo.IsDone)
-                    {
-                                <del>@todo.Description</del>
-                    }
-                    else
-                    {
-                        @todo.Description
-                    }
+        <h4 class="mt-4">
+            @group.Key.ToString("dddd, dd.MM.yyyy", new System.Globalization.CultureInfo("ru-RU"))
+        </h4>
 
-                       <div class="text-muted small">
-                        @todo.Date.ToString("dd.MM.yyyy") — @todo.DayOfWeek
-        <text>, @($"{todo.StartTime:hh\\:mm} - {todo.EndTime:hh\\:mm}")</text>
-    </div>
+        <ul class="list-group">
+            @foreach (var todo in group.OrderBy(t => t.StartTime))
+            {
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                            @if (todo.IsDone)
+                            {
+                                        <del>@todo.Description</del>
+                            }
+                            else
+                            {
+                                @todo.Description
+                            }
 
-                    </div>
-                    <div>
-                        <form method="post" asp-page-handler="ToggleDone" asp-route-id="@todo.Id" class="d-inline">
-                            <button type="submit" class="btn btn-sm @(todo.IsDone ? "btn-success" : "btn-outline-success")">
-                            @(todo.IsDone ? "Снять с выполнения" : "Выполнить")
-                            </button>
-                        </form>
-                        <form method="post" asp-page-handler="DeleteTodo" asp-route-id="@todo.Id" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
-                        </form>
-                    </div>
-                </div>
-            </li>
+                                <div class="text-muted small">
+                                @($"{todo.StartTime:HH\\:mm} - {todo.EndTime:HH\\:mm}")
+                                </div>
+                            </div>
+                            <div>
+                                <form method="post" asp-page-handler="ToggleDone" asp-route-id="@todo.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-sm @(todo.IsDone ? "btn-success" : "btn-outline-success")">
+                                    @(todo.IsDone ? "Снять с выполнения" : "Выполнить")
+                                    </button>
+                                </form>
+                                <form method="post" asp-page-handler="DeleteTodo" asp-route-id="@todo.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                    </li>
+            }
+        </ul>
     }
+
 </ul>
