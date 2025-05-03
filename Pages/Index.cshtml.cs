@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TodoApp.Models;
 using TodoApp.Data;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TodoApp.Pages
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly TodoContext _context;
@@ -21,6 +23,9 @@ namespace TodoApp.Pages
         public TodoItem NewTodo { get; set; } = new TodoItem();
 
         public IList<TodoItem> SortedTodoList { get; set; } = new List<TodoItem>();
+
+        
+
 
         public IActionResult OnPostAddTodo()
         {
@@ -102,3 +107,6 @@ namespace TodoApp.Pages
         }
     }
 }
+
+
+
