@@ -3,25 +3,26 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
+<!-- Делаем ul контейнером для кнопок с использованием классов d-flex и ms-auto -->
+<ul class="navbar-nav d-flex ms-auto"> <!-- d-flex для работы с flex, ms-auto для выравнивания по правому краю -->
     @if (SignInManager.IsSignedIn(User))
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Управление аккаунтом">Привет, @User.Identity?.Name!</a>
-        </li>
-        <li class="nav-item">
-            <form method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
-                <button type="submit" class="nav-link btn btn-link text-dark">Выйти</button>
-            </form>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Управление аккаунтом">Привет, @User.Identity?.Name!</a>
+            </li>
+            <li class="nav-item">
+                <form method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
+                    <button type="submit" class="nav-link btn btn-link text-dark">Выйти</button>
+                </form>
+            </li>
     }
     else
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Вход</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Регистрация</a>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Вход</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Регистрация</a>
+            </li>
     }
 </ul>

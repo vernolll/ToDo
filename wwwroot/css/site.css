@@ -22,3 +22,13 @@ body {
     margin-top: 10px;
     font-weight: bold;
 }
+
+.navbar-nav {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav-item {
+    margin-left: 10px;
+}
+
